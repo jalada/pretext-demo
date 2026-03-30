@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { prepare, layout } from '@chenglou/pretext'
+import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext'
 import './App.css'
 
 const testimonials = [
@@ -31,13 +31,18 @@ const TEXT_WIDTH = 500 - CARD_PADDING * 2
 const MAX_TEXT_HEIGHT = 500 - CARD_PADDING * 2 - 30 - 30 // minus attribution, dots
 const FIXED_FONT_SIZE = 42
 
+function fitsAtSize(text: string, size: number): boolean {
+  const prepared = prepareWithSegments(text, `${size}px "Playfair Display"`)
+  const { height, lines } = layoutWithLines(prepared, TEXT_WIDTH, Math.round(size * 1.15))
+  if (height > MAX_TEXT_HEIGHT) return false
+  return lines.every(line => line.width <= TEXT_WIDTH)
+}
+
 function findOptimalSize(text: string): number {
   let lo = 20, hi = 100
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2)
-    const prepared = prepare(text, `${mid}px "Playfair Display"`)
-    const { height } = layout(prepared, TEXT_WIDTH, Math.round(mid * 1.15))
-    if (height <= MAX_TEXT_HEIGHT) {
+    if (fitsAtSize(text, mid)) {
       lo = mid
     } else {
       hi = mid - 1
