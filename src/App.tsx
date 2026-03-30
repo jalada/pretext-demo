@@ -66,13 +66,8 @@ function App() {
   const testimonial = testimonials[currentIndex]
   const optimalSize = optimalSizes[currentIndex]
 
-  const dots = testimonials.map((_, i) => (
-    <button
-      key={i}
-      className={`dot${i === currentIndex ? ' active' : ''}`}
-      onClick={() => setCurrentIndex(i)}
-    />
-  ))
+  const fixedLineHeight = Math.round(FIXED_FONT_SIZE * 1.15)
+  const optimalLineHeight = Math.round(optimalSize * 1.15)
 
   return (
     <>
@@ -85,12 +80,20 @@ function App() {
           <span className="demo-label">Fixed size (naive)</span>
           <div className="card">
             <div className="card-content">
-              <div className="quote" style={{ fontSize: FIXED_FONT_SIZE }}>
+              <div className="quote" style={{ fontSize: FIXED_FONT_SIZE, lineHeight: `${fixedLineHeight}px` }}>
                 {testimonial.text}
               </div>
               <div className="attribution">{testimonial.author}</div>
             </div>
-            <div className="dots">{dots}</div>
+            <div className="dots">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  className={`dot${i === currentIndex ? ' active' : ''}`}
+                  onClick={() => setCurrentIndex(i)}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -98,12 +101,20 @@ function App() {
           <span className="demo-label">Pretext-optimised</span>
           <div className="card">
             <div className="card-content">
-              <div className="quote" style={{ fontSize: optimalSize }}>
+              <div className="quote" style={{ fontSize: optimalSize, lineHeight: `${optimalLineHeight}px` }}>
                 {testimonial.text}
               </div>
               <div className="attribution">{testimonial.author}</div>
             </div>
-            <div className="dots">{dots}</div>
+            <div className="dots">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  className={`dot${i === currentIndex ? ' active' : ''}`}
+                  onClick={() => setCurrentIndex(i)}
+                />
+              ))}
+            </div>
             <span className="size-badge">{optimalSize}px</span>
           </div>
         </div>
