@@ -1,13 +1,8 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { prepare, layout } from '@chenglou/pretext'
 import './App.css'
 
-interface Testimonial {
-  text: string
-  author: string
-}
-
-const testimonials: Testimonial[] = [
+const testimonials = [
   {
     text: "\u201CAs someone who struggles with chronic illness and very complex medical issues, Sollis has been a lifesaver.\u201D",
     author: "Kelsey, Sollis Member"
@@ -30,61 +25,25 @@ const testimonials: Testimonial[] = [
   }
 ]
 
-const CARD_WIDTH = 500
+// Must match .card dimensions in App.css
 const CARD_PADDING = 40
-const ATTR_HEIGHT = 30
-const DOTS_HEIGHT = 30
+const TEXT_WIDTH = 500 - CARD_PADDING * 2
+const MAX_TEXT_HEIGHT = 500 - CARD_PADDING * 2 - 30 - 30 // minus attribution, dots
 const FIXED_FONT_SIZE = 42
-const MAX_TEXT_HEIGHT = CARD_WIDTH - (CARD_PADDING * 2) - ATTR_HEIGHT - DOTS_HEIGHT
-const TEXT_WIDTH = CARD_WIDTH - (CARD_PADDING * 2)
 
-function findOptimalSize(text: string, minSize: number, maxSize: number): number {
-  for (let size = maxSize; size >= minSize; size -= 1) {
-    const fontStr = `${size}px "Playfair Display"`
-    const lineHeight = Math.round(size * 1.15)
-    const prepared = prepare(text, fontStr)
-    const result = layout(prepared, TEXT_WIDTH, lineHeight)
-    if (result.height <= MAX_TEXT_HEIGHT) {
-      return size
+function findOptimalSize(text: string): number {
+  let lo = 20, hi = 100
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2)
+    const prepared = prepare(text, `${mid}px "Playfair Display"`)
+    const { height } = layout(prepared, TEXT_WIDTH, Math.round(mid * 1.15))
+    if (height <= MAX_TEXT_HEIGHT) {
+      lo = mid
+    } else {
+      hi = mid - 1
     }
   }
-  return minSize
-}
-
-interface CardProps {
-  testimonial: Testimonial
-  fontSize: number
-  index: number
-  total: number
-  onSelect: (i: number) => void
-  label: string
-  badge?: string
-}
-
-function Card({ testimonial, fontSize, index, total, onSelect, label, badge }: CardProps) {
-  return (
-    <div className="demo-card-wrapper">
-      <span className="demo-label">{label}</span>
-      <div className="card">
-        <div className="card-content">
-          <div className="quote" style={{ fontSize }}>
-            {testimonial.text}
-          </div>
-          <div className="attribution">{testimonial.author}</div>
-        </div>
-        <div className="dots">
-          {Array.from({ length: total }, (_, i) => (
-            <button
-              key={i}
-              className={`dot${i === index ? ' active' : ''}`}
-              onClick={() => onSelect(i)}
-            />
-          ))}
-        </div>
-        {badge && <span className="size-badge">{badge}</span>}
-      </div>
-    </div>
-  )
+  return lo
 }
 
 function App() {
@@ -97,16 +56,23 @@ function App() {
     })
   }, [])
 
-  const optimalSize = useMemo(() => {
-    if (!fontReady) return FIXED_FONT_SIZE
-    return findOptimalSize(testimonials[currentIndex].text, 20, 100)
-  }, [currentIndex, fontReady])
+  const optimalSizes = useMemo(() => {
+    if (!fontReady) return null
+    return testimonials.map(t => findOptimalSize(t.text))
+  }, [fontReady])
 
-  const handleSelect = useCallback((i: number) => setCurrentIndex(i), [])
-
-  if (!fontReady) return null
+  if (!optimalSizes) return null
 
   const testimonial = testimonials[currentIndex]
+  const optimalSize = optimalSizes[currentIndex]
+
+  const dots = testimonials.map((_, i) => (
+    <button
+      key={i}
+      className={`dot${i === currentIndex ? ' active' : ''}`}
+      onClick={() => setCurrentIndex(i)}
+    />
+  ))
 
   return (
     <>
@@ -115,23 +81,32 @@ function App() {
       </h1>
 
       <div className="demo-container">
-        <Card
-          testimonial={testimonial}
-          fontSize={FIXED_FONT_SIZE}
-          index={currentIndex}
-          total={testimonials.length}
-          onSelect={handleSelect}
-          label="Fixed size (naive)"
-        />
-        <Card
-          testimonial={testimonial}
-          fontSize={optimalSize}
-          index={currentIndex}
-          total={testimonials.length}
-          onSelect={handleSelect}
-          label="Pretext-optimised"
-          badge={`${optimalSize}px`}
-        />
+        <div className="demo-card-wrapper">
+          <span className="demo-label">Fixed size (naive)</span>
+          <div className="card">
+            <div className="card-content">
+              <div className="quote" style={{ fontSize: FIXED_FONT_SIZE }}>
+                {testimonial.text}
+              </div>
+              <div className="attribution">{testimonial.author}</div>
+            </div>
+            <div className="dots">{dots}</div>
+          </div>
+        </div>
+
+        <div className="demo-card-wrapper">
+          <span className="demo-label">Pretext-optimised</span>
+          <div className="card">
+            <div className="card-content">
+              <div className="quote" style={{ fontSize: optimalSize }}>
+                {testimonial.text}
+              </div>
+              <div className="attribution">{testimonial.author}</div>
+            </div>
+            <div className="dots">{dots}</div>
+            <span className="size-badge">{optimalSize}px</span>
+          </div>
+        </div>
       </div>
 
       <p className="info">
