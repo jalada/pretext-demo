@@ -1,0 +1,107 @@
+.page-title {
+  font-family: system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.demo-container {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.demo-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.demo-label {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card {
+  width: 500px;
+  height: 500px;
+  background: #f5f2ed;
+  border-radius: 20px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.quote {
+  font-family: "Playfair Display", Georgia, serif;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+.attribution {
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-top: 16px;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 20px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ccc;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.dot.active {
+  background: #1a1a1a;
+}
+
+.info {
+  margin-top: 2rem;
+  max-width: 700px;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.size-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.06);
+  color: #888;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
